@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+
+    network_mode: service:db
+
+  db:
+    image: mariadb:lts
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: app
+      MARIADB_USER: mariadb
+      MARIADB_PASSWORD: mariadb
+      MARIADB_ROOT_PASSWORD: mariadb
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  db:
