@@ -65,20 +65,23 @@ USER ${USERNAME}
 
 ARG USER_HOME=/home/${USERNAME}
 
-WORKDIR ${USER_HOME}
-
 ENV NVM_DIR="${USER_HOME}/.nvm"
 
-# Install Node Version Manager and Node LTS
+# Install Node Version Manager
 RUN echo 'lts/*' > "${USER_HOME}/.nvmrc" \
     && git clone https://github.com/nvm-sh/nvm.git "${NVM_DIR}" \
     && cd ${NVM_DIR} \
     && git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)` \
-    && \. "$NVM_DIR/nvm.sh" && nvm install lts/* \
-    && touch /${USER_HOME}/.profile /${USER_HOME}/.bashrc \
     && echo '\. "$NVM_DIR/nvm.sh"' >> /${USER_HOME}/.profile \
     && echo '\. "$NVM_DIR/nvm.sh"' >> /${USER_HOME}/.bashrc \
     && echo '\. "$NVM_DIR/bash_completion"' >> /${USER_HOME}/.profile \
     && echo '\. "$NVM_DIR/bash_completion"' >> /${USER_HOME}/.bashrc
 
-WORKDIR /${USER_HOME}
+# Install Node LTS
+RUN \. "$NVM_DIR/nvm.sh" \
+    && nvm install lts/* \
+    && touch /${USER_HOME}/.profile /${USER_HOME}/.bashrc
+
+RUN mkdir -p ${USER_HOME}/app
+
+WORKDIR /${USER_HOME}/app
